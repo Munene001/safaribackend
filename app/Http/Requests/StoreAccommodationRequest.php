@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\CountryEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAccommodationRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class StoreAccommodationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,6 +26,11 @@ class StoreAccommodationRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'country_id' => [
+                'required',
+                'integer',
+                Rule::in(CountryEnum::getValues()), // Use getValues() instead of values()
+            ],
             'location' => 'required|string|max:255',
             'type' => 'required|string|max:50',
             'rating' => 'required|numeric|min:0|max:5',

@@ -4,11 +4,6 @@ namespace App\Enums;
 
 use BenSampo\Enum\Enum;
 
-/**
- * @method static static OptionOne()
- * @method static static OptionTwo()
- * @method static static OptionThree()
- */
 final class CountryEnum extends Enum
 {
     public const KENYA = 1;
@@ -23,7 +18,7 @@ final class CountryEnum extends Enum
     public const MAURITIUS = 10;
     public const MOZAMBIQUE = 11;
 
-    public function label()
+    public function label(): string
     {
         return match ($this) {
             self::KENYA => 'Kenya',
@@ -36,21 +31,28 @@ final class CountryEnum extends Enum
             self::SEYCHELLES => 'Seychelles',
             self::MAURITIUS => 'Mauritius',
             self::NAMIBIA => 'Namibia',
-            self::MALDIVES => 'Maldives'
-
+            self::MALDIVES => 'Maldives',
         };
     }
-    public static function options()
+
+    public static function options(): array
     {
         return array_reduce(self::cases(), function ($carry, $case) {
             $carry[$case->value] = $case->label();
             return $carry;
-
         }, []);
     }
-    public static function values()
-    {
-        return array_column(self::cases(), 'value');
-    }
 
+    public static function fromValue($enumValue): static
+    {
+        if (is_string($enumValue) && is_numeric($enumValue)) {
+            return parent::fromValue((int) $enumValue);
+        }
+
+        if (is_string($enumValue) && !is_numeric($enumValue)) {
+            return self::fromKey($enumValue);
+        }
+
+        return parent::fromValue($enumValue);
+    }
 }

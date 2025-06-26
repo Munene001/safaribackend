@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Itinerary extends Model
 {
     use HasFactory;
+    protected $table = 'Itineraries';
     protected $primaryKey = 'itinerary_id';
     protected $fillable = [
         'country_id',
@@ -20,6 +21,7 @@ class Itinerary extends Model
         'image_url',
 
     ];
+    public $timestamps = false;
     public function country()
     {
 

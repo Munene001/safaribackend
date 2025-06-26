@@ -63,20 +63,10 @@ class ItineraryService
             return $itinerary->load([
                 'country',
                 'subItineraries.dayPlans',
-                'subItineraries.activities.images',
                 'subItineraries.accommodations.images',
                 'subItineraries.accommodations.features',
             ]);
         }, 5);
-    }
-
-    public function attachActivity($itineraryId, $subItineraryId, array $data)
-    {
-        $subItinerary = SubItinerary::where('itinerary_id', $itineraryId)->findOrFail($subItineraryId);
-        $subItinerary->activities()->attach($data['activity_id'], [
-            'day_number' => $data['day_number'],
-            'time_of_day' => $data['time_of_day'],
-        ]);
     }
 
     public function attachAccommodation($itineraryId, $subItineraryId, array $data)

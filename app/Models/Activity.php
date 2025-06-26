@@ -8,20 +8,27 @@ use Illuminate\Database\Eloquent\Model;
 class Activity extends Model
 {
     use HasFactory;
+    protected $table = 'Activities';
+
+    protected $primaryKey = 'activity_id';
     protected $fillable = [
+        'country_id',
         'activity_name',
         'description',
         'difficulty_level',
         'duration_hours',
+
     ];
+    public $timestamps = false;
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id');
+    }
 
     public function images()
     {
         return $this->hasmany(ActivityImage::class, 'activity_id');
     }
-    public function subItineraries()
-    {
-        return $this->belongsToMany(SubItinerary::class, 'sub_itinerary_activities', 'activity_id', 'sub_itinerary_id')->withPivot(['day_number', 'time_of_day']);
 
-    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\CountryEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreItineraryRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class StoreItineraryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,13 +25,17 @@ class StoreItineraryRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'country_id' => 'required|integer|in:' . implode(',', CountryEnum::values()),
+            'country_id' => [
+                'required',
+                'integer',
+                Rule::in(CountryEnum::getValues()), // Use getValues() instead of values()
+            ],
             'overview' => 'required|string',
             'best_season' => 'required|string',
             'main_destination' => 'required|string',
             'destination_description' => 'required|string',
             'destination_location' => 'required|string',
-            'image_url' => 'required|image|mimes:jpeg,png,jpg,webp|max:250',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:250',
             'sub_itineraries' => 'required|array',
             'sub_itineraries.*.duration_days' => 'required|integer',
             'sub_itineraries.*.duration_nights' => 'required|integer',

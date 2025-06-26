@@ -13,6 +13,7 @@ class ActivityService
         $activity = Activity::create([
             'activity_name' => $data['activity_name'],
             'description' => $data['description'],
+            'country_id' => $data['country_id'],
             'difficulty_level' => $data['difficulty_level'],
             'duration_hours' => $data['duration_hours'],
 
@@ -24,17 +25,17 @@ class ActivityService
         if (!isset($data['primary_image']) || !$data['primary_image']->isValid()) {
             throw new \Exception('Primary image is required or invalid');
         }
-        $this->storeImage($data['primary_image'], $activity->id, true);
+        $this->storeImage($data['primary_image'], $activity->activity_id, true);
         if (isset($data['gallery_images'])) {
             foreach ($data['gallery_images'] as $image) {
                 if ($image->isValid()) {
-                    $this->storeImage($image, $activity->id, false);
+                    $this->storeImage($image, $activity->activity_id, false);
                 } else {
                     Log::error('Invalid gallery image skipped');
                 }
             }
         }
-        return $activity->load('images');
+        return $activity->load('country','images');
 
     }
     private function storeImage($imageFile, $activityId, $isPrimary)

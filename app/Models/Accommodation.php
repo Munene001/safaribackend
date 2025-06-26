@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Accommodation extends Model
 {
     use HasFactory;
+    protected $table = 'Accommodations';
     protected $primaryKey = 'accommodation_id';
     protected $fillable = [
+        'country_id',
         'name',
         'description',
         'location',
@@ -18,6 +20,12 @@ class Accommodation extends Model
         'website_url',
 
     ];
+    public $timestamps = false;
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id');
+    }
 
     public function features()
     {

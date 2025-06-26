@@ -11,7 +11,7 @@ class StoreItineraryAccommodationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,7 @@ class StoreItineraryAccommodationRequest extends FormRequest
     {
         return [
 
-            'accommodation_id' => 'required|integer|exists:accommodations,id',
+            'accommodation_id' => 'required|integer|exists:Accommodations,accommodation_id',
             'night_number' => 'required|integer',
             //
         ];

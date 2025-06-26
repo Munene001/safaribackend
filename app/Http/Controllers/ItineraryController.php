@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreItineraryAccommodationRequest;
-use App\Http\Requests\StoreItineraryActivityRequest;
 use App\Http\Requests\StoreItineraryRequest;
 use App\Services\ItineraryService;
 use Illuminate\Support\Facades\Log;
@@ -40,20 +39,6 @@ class ItineraryController extends Controller
 
             return response()->json([
                 'error' => 'Itinerary creation failed',
-                'message' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    public function attachActivity(StoreItineraryActivityRequest $request, $itineraryId, $subItineraryId)
-    {
-        try {
-            $this->itineraryService->attachActivity($itineraryId, $subItineraryId, $request->validated());
-            return response()->json(['message' => 'Activity attached'], 201);
-        } catch (\Exception $e) {
-            Log::error('Activity attachment failed: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Activity attachment failed',
                 'message' => $e->getMessage(),
             ], 500);
         }

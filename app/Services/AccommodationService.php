@@ -14,6 +14,7 @@ class AccommodationService
         $accommodation = Accommodation::create([
             'name' => $data['name'],
             'description' => $data['description'],
+            'country_id' => $data['country_id'],
             'location' => $data['location'],
             'type' => $data['type'],
             'rating' => $data['rating'],
@@ -27,12 +28,12 @@ class AccommodationService
             throw new \Exception('Primary image is required or invalid');
 
         }
-        $this->storeImage($data['primary_image'], $accommodation->id, true);
+        $this->storeImage($data['primary_image'], $accommodation->accommodation_id, true);
 
         if (isset($data['gallery_images'])) {
             foreach ($data['gallery_images'] as $image) {
                 if ($image->isValid()) {
-                    $this->storeImage($image, $accommodation->id, false);
+                    $this->storeImage($image, $accommodation->accommodation_id, false);
                 } else {
                     Log::error('Invalid gallery image skipped');
                 }
@@ -41,14 +42,14 @@ class AccommodationService
         if (isset($data['features'])) {
             foreach ($data['features'] as $featureData) {
                 AccommodationFeature::create([
-                    'accommodation_id' => $accommodation->id,
+                    'accommodation_id' => $accommodation->accommodation_id,
                     'feature_name' => $featureData['feature_name'],
                     'feature_value' => $featureData['feature_value'],
                 ]);
             }
         }
 
-        return $accommodation->load(['images', 'features']);
+        return $accommodation->load(['country', 'images', 'features']);
     }
     private function storeImage($imageFile, $accommodationId, $isPrimary)
     {
