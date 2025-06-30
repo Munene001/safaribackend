@@ -44,7 +44,7 @@ class AccommodationService
                 AccommodationFeature::create([
                     'accommodation_id' => $accommodation->accommodation_id,
                     'feature_name' => $featureData['feature_name'],
-                    'feature_value' => $featureData['feature_value'],
+
                 ]);
             }
         }

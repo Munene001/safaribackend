@@ -14,7 +14,6 @@ class AccommodationFeature extends Model
     protected $fillable = [
         'accommodation_id',
         'feature_name',
-        'feature_value',
     ];
     public $timestamps = false;
 

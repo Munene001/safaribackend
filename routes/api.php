@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccommodationController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\ItineraryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,3 +28,5 @@ Route::post('/itineraries/{itinerary}/sub-itineraries/{subItinerary}/activities'
     [ItineraryController::class, 'attachActivity']);
 Route::post('/itineraries/{itinerary}/sub-itineraries/{subItinerary}/accommodations',
     [ItineraryController::class, 'attachAccommodation']);
+Route::get('/countries', [CountryController::class, 'getCountries']);
+Route::get('/countries/{countryId}', [CountryController::class, 'getCountryById']);

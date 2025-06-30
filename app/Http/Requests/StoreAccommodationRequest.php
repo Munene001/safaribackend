@@ -33,13 +33,13 @@ class StoreAccommodationRequest extends FormRequest
             ],
             'location' => 'required|string|max:255',
             'type' => 'required|string|max:50',
-            'rating' => 'required|numeric|min:0|max:5',
+            'rating' => 'required|numeric|between:0,5|regex:/^\d+(\.\d{1})?$/',
             'website_url' => 'nullable|url|max:500',
             'primary_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:250',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:250',
             'features' => 'nullable|array',
             'features.*.feature_name' => 'required|string',
-            'features.*.feature_value' => 'required|string',
+
             //
         ];
     }
