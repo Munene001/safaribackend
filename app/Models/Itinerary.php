@@ -18,7 +18,6 @@ class Itinerary extends Model
         'main_destination',
         'destination_description',
         'destination_location',
-        'image_url',
 
     ];
     public $timestamps = false;
@@ -31,5 +30,8 @@ class Itinerary extends Model
     {
         return $this->hasMany(SubItinerary::class, 'itinerary_id');
     }
-
+    public function images()
+    {
+        return $this->hasMany(ItineraryImage::class, 'itinerary_id');
+    }
 }

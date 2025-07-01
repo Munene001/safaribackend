@@ -21,7 +21,8 @@ class ItineraryController extends Controller
         try {
             // Pass validated data and uploaded file
             $data = $request->validated();
-            $data['image'] = $request->file('image');
+            $data['primary_image'] = $request->file('primary_image');
+            $data['gallery_images'] = $request->file('gallery_images');
 
             $itinerary = $this->itineraryService->createItinerary($data);
 

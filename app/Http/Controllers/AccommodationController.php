@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAccommodationRequest;
+use App\Models\Accommodation;
 use App\Services\AccommodationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class AccommodationController extends Controller
@@ -12,6 +14,38 @@ class AccommodationController extends Controller
     public function __construct(AccommodationService $accommodationService)
     {
         $this->accommodationService = $accommodationService;
+    }
+    public function index(Request $request)
+    {
+        try {
+            $accommodations = Accommodation::query()
+                ->select('accommodation_id', 'name', 'location')
+                ->orderBy('name')
+                ->get()
+                ->map(function ($acc) {
+                    return [
+
+                        'accommodation_id' => $acc->accommodation_id,
+                        'name' => $acc->name,
+                        'location' => $acc->location,
+                    ];
+
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $accommodations,
+            ]);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch accommodations',
+                'error' => $e->getMessage(),
+
+            ], 500);
+        }
+
     }
     public function store(StoreAccommodationRequest $request)
     {
