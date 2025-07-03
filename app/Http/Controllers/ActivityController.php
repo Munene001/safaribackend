@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreActivityRequest;
+use App\Models\Activity;
 use App\Services\ActivityService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ActivityController extends Controller
@@ -41,5 +43,23 @@ class ActivityController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+    public function index(Request $request)
+    {
+        $count = Activity::count();
+        $activities = Activity::with(['images', 'country'])->get();
+        return response()->json(['activities' => $activities, 'count' => $count]);
+
+    }
+    public function show($activity_id)
+    {
+        $activity = Activity::with('images', 'country')->findOrFail($activity_id);
+        return response()->json($activity);
+    }
+    public function destroy($activity_id)
+    {
+        $activity = Activity::findOrFail($activity_id);
+        $activity->delete();
+        return response()->json(['message' => 'Activity deleted successfully'], 200);
     }
 }

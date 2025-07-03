@@ -15,38 +15,7 @@ class AccommodationController extends Controller
     {
         $this->accommodationService = $accommodationService;
     }
-    public function index(Request $request)
-    {
-        try {
-            $accommodations = Accommodation::query()
-                ->select('accommodation_id', 'name', 'location')
-                ->orderBy('name')
-                ->get()
-                ->map(function ($acc) {
-                    return [
 
-                        'accommodation_id' => $acc->accommodation_id,
-                        'name' => $acc->name,
-                        'location' => $acc->location,
-                    ];
-
-                });
-
-            return response()->json([
-                'success' => true,
-                'data' => $accommodations,
-            ]);
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to fetch accommodations',
-                'error' => $e->getMessage(),
-
-            ], 500);
-        }
-
-    }
     public function store(StoreAccommodationRequest $request)
     {
 
@@ -77,6 +46,60 @@ class AccommodationController extends Controller
 
         }
 
+    }
+    public function index(Request $request)
+    {
+        try {
+            // Check if this is a minimal request (e.g., for dropdowns/day plans)
+            $minimal = $request->has('minimal') && $request->input('minimal') == 'true';
+
+            if ($minimal) {
+                // Minimal data for dropdowns/day plans
+                $accommodations = Accommodation::query()
+                    ->select('accommodation_id', 'name', 'location')
+                    ->orderBy('name')
+                    ->get()
+                    ->map(function ($acc) {
+                        return [
+                            'accommodation_id' => $acc->accommodation_id,
+                            'name' => $acc->name,
+                            'location' => $acc->location,
+                        ];
+                    });
+
+                return response()->json([
+                    'success' => true,
+                    'data' => $accommodations,
+                ]);
+            } else {
+                // Full data with relationships (for admin dashboard)
+                $count = Accommodation::count();
+                $accommodations = Accommodation::with(['images', 'features', 'country'])->get();
+
+                return response()->json([
+                    'success' => true,
+                    'accommodations' => $accommodations,
+                    'count' => $count,
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch accommodations',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    public function show($accommodation_id)
+    {
+        $accommodation = Accommodation::with('images', 'features', 'country')->findOrFail($accommodation_id);
+        return response()->json($accommodation);
+    }
+    public function destroy($accommodation_id)
+    {
+        $accommodation = Accommodation::findOrFail($accommodation_id);
+        $accommodation->delete();
+        return response()->json(['message' => 'Accommodation deleted successfully'], 200);
     }
 
     //

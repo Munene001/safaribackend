@@ -29,3 +29,11 @@ Route::post('/itineraries/{itinerary}/sub-itineraries/{subItinerary}/accommodati
 Route::get('/countries', [CountryController::class, 'getCountries']);
 Route::get('/countries/{countryId}', [CountryController::class, 'getCountryById']);
 Route::get('/accommodations', [AccommodationController::class, 'index']);
+Route::get('/accommodation/{accommodation_id}', [AccommodationController::class, 'show']);
+Route::delete('/accommodation/{accommodation_id}', [AccommodationController::class, 'destroy']);
+Route::get('/activities', [ActivityController::class, 'index']);
+Route::get('/activity/{activity_id}', [ActivityController::class, 'show']);
+Route::delete('/activity/{activity_id}', [ActivityController::class, 'destroy']);
+Route::get('/itineraries', [ItineraryController::class, 'index']);
+Route::get('/itinerary/{itinerary_id}', [ItineraryController::class, 'show']);
+Route::delete('/itinerary/{itinerary_id}', [ItineraryController::class, 'destroy']);

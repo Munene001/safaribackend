@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreItineraryAccommodationRequest;
 use App\Http\Requests\StoreItineraryRequest;
+use App\Models\Itinerary;
 use App\Services\ItineraryService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ItineraryController extends Controller
@@ -57,5 +59,23 @@ class ItineraryController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+    public function index(Request $request)
+    {
+        $count = Itinerary::count();
+        $itineraries = Itinerary::with(['images', 'country', 'subItineraries'])->get();
+        return response()->json(['itineraries' => $itineraries, 'count' => $count]);
+
+    }
+    public function show($itinerary_id)
+    {
+        $itinerary = Itinerary::with('images', 'country', 'subItineraries')->findOrFail($itinerary_id);
+        return response()->json($itinerary);
+    }
+    public function destroy($itinerary_id)
+    {
+        $itinerary = Itinerary::findOrFail($itinerary_id);
+        $itinerary->delete();
+        return response()->json(['message' => 'Itinerary deleted successfully'], 200);
     }
 }

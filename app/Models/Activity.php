@@ -17,6 +17,7 @@ class Activity extends Model
         'description',
         'difficulty_level',
         'duration_hours',
+        'created_at',
 
     ];
     public $timestamps = false;

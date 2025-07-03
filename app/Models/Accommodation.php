@@ -18,6 +18,7 @@ class Accommodation extends Model
         'type',
         'rating',
         'website_url',
+        'created_at',
 
     ];
     public $timestamps = false;

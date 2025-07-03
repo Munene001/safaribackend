@@ -18,6 +18,7 @@ class Itinerary extends Model
         'main_destination',
         'destination_description',
         'destination_location',
+        'created_at',
 
     ];
     public $timestamps = false;
