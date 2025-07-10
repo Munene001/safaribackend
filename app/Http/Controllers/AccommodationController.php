@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAccommodationRequest;
 use App\Models\Accommodation;
+use App\Models\AccommodationFeature;
+use App\Models\AccommodationImage;
 use App\Services\AccommodationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AccommodationController extends Controller
 {
@@ -102,5 +105,93 @@ class AccommodationController extends Controller
         return response()->json(['message' => 'Accommodation deleted successfully'], 200);
     }
 
+    public function update(Request $request, $accommodation_id)
+    {
+        try {
+            $data = $request->validated();
+            $accommodation = Accommodation::findOrFail($accommodation_id);
+
+            $accommodation->update([
+                'name' => $data['name'],
+                'description' => $data, ['description'],
+                'location' => $data['location'],
+                'type' => $data['type'],
+                'website_url' => $data['website_url'],
+                'rating' => $data['rating'],
+                'country_id' => $data['country_id'],
+            ]);
+            $this->updateFeatures($accommodation, $data['features'] ?? []);
+            $this->updateImages($accommodation, $request->file('primary_image'), $request->file('gallery_images'), $data['images_to_delete'] ?? [], $data['new_primary_image_id'] ?? null);
+            return response()->json([
+                'message' => 'Accommodation updated successfully',
+                'accommodation' => $accommodation->load('images', 'features'),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Accommodation update failed: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Update failed',
+                'message' => $e->getMessage(),
+
+            ]);
+
+        }
+    }
+    protected function updateFeatures(Accommodation $accommodation, array $features)
+    {
+        $accommodation->features()->delete();
+        foreach ($features as $feature) {
+            AccommodationFeature::create([
+                'accommodation_id' => $accommodation->id,
+                'feature_name' => $feature,
+
+            ]);
+        }
+
+    }
+    protected function updateImages(
+        Accommodation $accommodation,
+        $newPrimaryImage,
+        $newGalleryImages,
+        array $imageIdsToDelete,
+        $newPrimaryImageId = null
+    ) {
+        if (!empty($imageIdsToDelete)) {
+            $images = AccommodationImage::where('accommodation_id', $accommodation->id)
+                ->whereIn('image_id', $imageIdsToDelete)
+                ->get();
+            foreach ($images as $image) {
+                Storage::delete($image->image_url);
+                $image->delete();
+            }
+        }
+        if ($newPrimaryImage) {
+            $oldPrimary = $accommodation->images()->where('is_primary', true)->first();
+            if ($oldPrimary) {
+                Storage::delete($oldPrimary->image_url);
+                $oldPrimary->delete();
+            }
+            $path = $newPrimaryImage->store('public/accommodations');
+            AccommodationImage::create([
+                'accommodation_id' => $accommodation->id,
+                'image_url' => str_replace('public/', '/storage/', $path),
+                'is_primary' => true,
+            ]);
+        } elseif ($newPrimaryImageId) {
+            $accommodation->images()->update(['is_primary' => false]);
+            $accommodation->images()
+                ->where('image_id', $newPrimaryImageId)
+                ->update(['is_primary' => true]);
+        }
+        if ($newGalleryImages) {
+            foreach ($newGalleryImages as $image) {
+                $path = $image->store('public/accommodations');
+                AccommodationImage::create([
+                    'accommodation_id' => $accommodation->id,
+                    'image_url' => str_replace('public/', '/storage/', $path),
+                    'is_primary' => false,
+                ]);
+            }
+        }
+    }
     //
 }
