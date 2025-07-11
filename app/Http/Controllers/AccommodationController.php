@@ -107,38 +107,73 @@ class AccommodationController extends Controller
 
     public function update(Request $request, $accommodation_id)
     {
+        Log::debug('Incoming request data', ['data' => $request->all()]);
+        Log::debug('Files', ['files' => $request->file() ?: []]);
         try {
-            $data = $request->validated();
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'location' => 'required|string|max:255',
+                'type' => 'required|string|max:255',
+                'website_url' => 'nullable|url|max:255',
+                'rating' => 'nullable|numeric|min:0|max:5',
+                'country_id' => 'required|exists:countries,id',
+                'features_text' => 'nullable|string',
+                'images_to_delete' => 'nullable|array',
+                'images_to_delete.*' => 'integer',
+                'new_primary_image_id' => 'nullable|integer',
+                'primary_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'gallery_images' => 'nullable|array',
+                'gallery_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
             $accommodation = Accommodation::findOrFail($accommodation_id);
 
             $accommodation->update([
-                'name' => $data['name'],
-                'description' => $data, ['description'],
-                'location' => $data['location'],
-                'type' => $data['type'],
-                'website_url' => $data['website_url'],
-                'rating' => $data['rating'],
-                'country_id' => $data['country_id'],
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'location' => $validated['location'],
+                'type' => $validated['type'],
+                'website_url' => $validated['website_url'] ?? null,
+                'rating' => $validated['rating'] ?? null,
+                'country_id' => $validated['country_id'],
             ]);
-            $this->updateFeatures($accommodation, $data['features'] ?? []);
-            $this->updateImages($accommodation, $request->file('primary_image'), $request->file('gallery_images'), $data['images_to_delete'] ?? [], $data['new_primary_image_id'] ?? null);
+
+            $this->updateFeatures($accommodation, $validated['features_text'] ?? '');
+            $this->updateImages(
+                $accommodation,
+                $request->file('primary_image'),
+                $request->file('gallery_images'),
+                $validated['images_to_delete'] ?? [],
+                $validated['new_primary_image_id'] ?? null
+            );
+
             return response()->json([
                 'message' => 'Accommodation updated successfully',
                 'accommodation' => $accommodation->load('images', 'features'),
             ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation error',
+                'messages' => $e->errors(),
+            ], 422);
         } catch (\Exception $e) {
             Log::error('Accommodation update failed: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Update failed',
                 'message' => $e->getMessage(),
-
-            ]);
-
+            ], 500);
         }
     }
-    protected function updateFeatures(Accommodation $accommodation, array $features)
+    protected function updateFeatures(Accommodation $accommodation, string $featuresText)
     {
         $accommodation->features()->delete();
+        $features = array_filter(
+            array_map('trim', preg_split('/[\n]+/', $featuresText)),
+            fn($item) => !empty($item)
+        );
+
         foreach ($features as $feature) {
             AccommodationFeature::create([
                 'accommodation_id' => $accommodation->id,
@@ -146,8 +181,8 @@ class AccommodationController extends Controller
 
             ]);
         }
-
     }
+
     protected function updateImages(
         Accommodation $accommodation,
         $newPrimaryImage,

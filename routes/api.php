@@ -31,7 +31,7 @@ Route::get('/countries/{countryId}', [CountryController::class, 'getCountryById'
 Route::get('/accommodations', [AccommodationController::class, 'index']);
 Route::get('/accommodation/{accommodation_id}', [AccommodationController::class, 'show']);
 Route::delete('/accommodation/{accommodation_id}', [AccommodationController::class, 'destroy']);
-Route::put('/accommodations/{accommodation}', [AccommodationController::class, 'update']);
+Route::put('/accommodations/{accommodation_id}', [AccommodationController::class, 'update']);
 Route::get('/activities', [ActivityController::class, 'index']);
 Route::get('/activity/{activity_id}', [ActivityController::class, 'show']);
 Route::delete('/activity/{activity_id}', [ActivityController::class, 'destroy']);
