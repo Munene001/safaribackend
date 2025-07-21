@@ -69,7 +69,7 @@ class ItineraryController extends Controller
     }
     public function show($itinerary_id)
     {
-        $itinerary = Itinerary::with('images', 'country', 'subItineraries')->findOrFail($itinerary_id);
+        $itinerary = Itinerary::with('images', 'country', 'subItineraries.dayPlans')->findOrFail($itinerary_id);
         return response()->json($itinerary);
     }
     public function destroy($itinerary_id)

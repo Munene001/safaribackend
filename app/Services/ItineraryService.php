@@ -70,9 +70,10 @@ class ItineraryService
 
             return $itinerary->load([
                 'country',
-                'subItineraries.dayPlans',
-                'subItineraries.accommodations.images',
-                'subItineraries.accommodations.features',
+                'subItineraries' => function ($query) {
+                    $query->with('dayPlans', 'accommodations.images', 'accommodations.features');
+                },
+
                 'images',
             ]);
         }, 5);
