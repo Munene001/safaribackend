@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\AccommodationController;
 use App\Http\Controllers\ActivityController;
-use App\Http\Controllers\CountryController;
 use App\Http\Controllers\ItineraryController;
+use App\Http\Controllers\CountryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,8 +26,18 @@ Route::post('/activities', [ActivityController::class, 'store']);
 Route::post('/itineraries', [ItineraryController::class, 'store']);
 Route::post('/itineraries/{itinerary}/sub-itineraries/{subItinerary}/accommodations',
     [ItineraryController::class, 'attachAccommodation']);
-Route::get('/countries', [CountryController::class, 'getCountries']);
-Route::get('/countries/{countryId}', [CountryController::class, 'getCountryById']);
+Route::prefix('countries')->group(function () {
+    // Get all countries (basic info)
+    Route::get('/', [CountryController::class, 'getCountries']);
+
+    // Get single country with full details
+    Route::get('/{countryId}', [CountryController::class, 'getCountryById'])
+        ->where('countryId', '[0-9]+');
+
+    // Create country data (with FAQs, Parks, Image)
+    Route::post('/', [CountryController::class, 'createCountry']);
+    Route::delete('/{id}', [CountryController::class, 'deleteCountry']);
+});
 Route::get('/accommodations', [AccommodationController::class, 'index']);
 Route::get('/accommodation/{accommodation_id}', [AccommodationController::class, 'show']);
 Route::delete('/accommodation/{accommodation_id}', [AccommodationController::class, 'destroy']);

@@ -11,7 +11,10 @@ class Country extends Model
 
     protected $table = 'Countries';
     protected $primaryKey = 'country_id';
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'overview',
+        'about',
+        'image_url',
+        'best_time_to_visit'];
 
     protected $casts = [
         'country_id' => 'integer',
@@ -31,4 +34,13 @@ class Country extends Model
     {
         return $this->hasMany(Itinerary::class, 'country_id');
     }
+    public function parks()
+    {
+        return $this->hasMany(Park::class, 'country_id');
+    }
+    public function faqs()
+    {
+        return $this->hasMany(CountryFAQ::class, 'country_id');
+    }
+
 }

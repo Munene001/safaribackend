@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\CountryEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,11 +24,9 @@ class StoreActivityRequest extends FormRequest
     {
         return [
             'activity_name' => 'required|string|max:255',
-            'country_id' => [
-                'required',
-                'integer',
-                Rule::in(CountryEnum::getValues()), // Use getValues() instead of values()
-            ],
+            'country_id' => 'required|integer|exists:Countries,country_id',
+            // Use getValues() instead of values()
+
             'description' => 'required|string',
             'difficulty_level' => 'required|string',
             'duration_hours' => 'required|numeric',

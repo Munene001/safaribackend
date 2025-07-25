@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\CountryEnum;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,11 +24,8 @@ class StoreItineraryRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'country_id' => [
-                'required',
-                'integer',
-                Rule::in(CountryEnum::getValues()), // Use getValues() instead of values()
-            ],
+            'country_id' => 'required|integer|exists:Countries,country_id',
+
             'overview' => 'required|string',
             'best_season' => 'required|string',
             'main_destination' => 'required|string',

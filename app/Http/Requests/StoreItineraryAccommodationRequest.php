@@ -23,8 +23,8 @@ class StoreItineraryAccommodationRequest extends FormRequest
     {
         return [
 
-            'accommodation_id' => 'required|integer|exists:Accommodations,accommodation_id',
-            'night_number' => 'required|integer',
+            'accommodation_id' => 'nullable|integer|exists:Accommodations,accommodation_id',
+            'night_number' => 'nullable|integer',
             //
         ];
     }
