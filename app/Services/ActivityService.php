@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\Activity;
 use App\Models\ActivityImage;
+use App\Models\Country;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,11 +14,16 @@ class ActivityService
         $activity = Activity::create([
             'activity_name' => $data['activity_name'],
             'description' => $data['description'],
-            'country_id' => $data['country_id'],
+            'country_id' => $data['country_id'] === '' ? null : $data['country_id'],
             'difficulty_level' => $data['difficulty_level'],
             'duration_hours' => $data['duration_hours'],
 
         ]);
+
+        if (!Country::where('country_id', $data['country_id'])->exists()) {
+            throw new \Exception('Invalid country_id provided');
+        }
+
         if (!$activity) {
             throw new \Exception('Failed to create activity record');
 
@@ -35,7 +41,7 @@ class ActivityService
                 }
             }
         }
-        return $activity->load('country','images');
+        return $activity->load('country', 'images');
 
     }
     private function storeImage($imageFile, $activityId, $isPrimary)

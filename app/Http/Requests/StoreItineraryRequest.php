@@ -25,7 +25,6 @@ class StoreItineraryRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'country_id' => 'required|integer|exists:Countries,country_id',
-
             'overview' => 'required|string',
             'best_season' => 'required|string',
             'main_destination' => 'required|string',

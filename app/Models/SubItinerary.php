@@ -27,7 +27,7 @@ class SubItinerary extends Model
     }
     public function accommodations()
     {
-        return $this->belongsToMany(Accommodation::class, 'Sub_Itinerary_Accommodations', 'sub_itinerary_id', 'accommodation_id')->withPivot('night_number');
+        return $this->belongsToMany(Accommodation::class, 'Sub_Itinerary_Accommodations', 'sub_itinerary_id', 'accommodation_id');
 
     }
 
